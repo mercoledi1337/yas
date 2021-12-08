@@ -1,49 +1,102 @@
-from typing import Any, List, Callable
+from typing import Any, Callable
 
+import binarytree as binarytree
+from binarytree import tree, bst, heap
 
-class TreeNode:
+class BinaryNode:
     def __init__(self, value):
-        self.value: Any = value
-        self.parent: Any = None
-        self.children: List['TreeNode'] = []
+        self.left_child = None
+        self.right_child = None
+        self.value = value
 
-    def add(self, child: 'TreeNode') -> None:
-        child.parent = self
-        assert isinstance(child, TreeNode)
-        self.children.append(child)
-
-    def is_leaf(self) -> bool:
-        if (self.children is None):
+    def is_leaf(self):
+        if self.right_child is None and self.left_child is None:
             return True
         return False
 
-    # def print(self):
-    #     print(self.value)
-    #
-    def for_each_deep_first(self, visit: Callable[['TreeNode'], None]) -> None:
-        visit.append(TreeNode)
-        for children in self.children[TreeNode]:
-            if children not in visit:
-                self.for_each_deep_first(children, visit)
+    def add_left_child(self, value: Any):
+        if self.left_child is None:
+            self.left_child = BinaryNode(value)
+        else:
+            print("This node already has a left child!")
+
+    def add_right_child(self, value: Any):
+        if self.right_child is None:
+            self.right_child = BinaryNode(value)
+        else:
+            print("This node already has a right child")
+
+    def treverse_in_order(self, visit: Callable[[Any], None]):
+        if self.left_child is not None:
+            self.left_child.treverse_in_order(visit)
+        visit(self)
+        if self.right_child is not None:
+            self.right_child.treverse_in_order(visit)
+
+    def treverse_post_order(self, visit: Callable[[Any], None]):
+        if self.left_child is not None:
+            self.left_child.treverse_post_order(visit)
+        if self.right_child is not None:
+            self.right_child.treverse_post_order(visit)
+        visit(self)
+
+    def treverse_pre_order(self, visit: Callable[[Any], None]):
+        visit(self)
+        if self.left_child is not None:
+            self.left_child.treverse_pre_order(visit)
+        if self.right_child is not None:
+            self.right_child.treverse_pre_order(visit)
+
+    def printNode(self):
+        if self.value is not None:
+            print(self.value)
+        else:
+            print("Ludzie przecież tu nikogo nie ma")
+
+class BinaryTree:
+    def __init__(self, root):
+        self.root: BinaryNode = BinaryNode(root)
+
+    def treverse_in_order(self, visit: Callable[[Any], None]):
+        if self.root.left_child is not None:
+            self.root.left_child.treverse_in_order(visit)
+        visit(self)
+        if self.root.right_child is not None:
+            self.root.right_child.treverse_in_order(visit)
+
+    def treverse_post_order(self, visit: Callable[[Any], None]):
+        if self.root.left_child is not None:
+            self.root.left_child.treverse_post_order(visit)
+        if self.root.right_child is not None:
+            self.root.right_child.treverse_post_order(visit)
+        visit(self)
+
+    def treverse_pre_order(self, visit: Callable[[Any], None]):
+        visit(self)
+        if self.root.left_child is not None:
+            self.root.left_child.treverse_pre_order(visit)
+        if self.root.right_child is not None:
+            self.root.right_child.treverse_pre_order(visit)
 
 
-class Tree:
-    def __init__(self):
-        self.root: TreeNode = None
-        self.tree = []
 
-    def add(self, value: Any, parent_value: Any) -> None:
-        child = TreeNode(value)
-        child.parent = parent_value
-        self.tree.append(child)
+tree = BinaryTree(10)
+tree.root.add_right_child(2)
+tree.root.add_left_child(9)
+tree.root.left_child.add_left_child(1)
+tree.root.left_child.add_right_child(3)
+tree.root.right_child.add_right_child(6)
+tree.root.right_child.add_left_child(4)
+
+assert tree.root.right_child.value == 2
+assert tree.root.right_child.is_leaf() is False
+
+assert tree.root.left_child.left_child.value == 1
+assert tree.root.left_child.left_child.is_leaf() is True
 
 
-root = TreeNode('root')
-tree = Tree()
-tree.add(root, None)
-tree.add(5, root)
-tree.add(6, 5)
-tree.add(7, 5)
+def wypisz(node: 'BinaryNode'):
+    print(node.value)
 
-for c in tree.tree:
-    print(c.value)
+tree.treverse_post_order(wypisz)
+
